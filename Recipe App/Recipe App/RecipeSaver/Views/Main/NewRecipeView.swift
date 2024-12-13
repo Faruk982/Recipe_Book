@@ -11,9 +11,7 @@ struct NewRecipeView: View {
     @State private var ingredients: String = ""
     @State private var description: String = ""
     
-    @State private var navigateToHomeView = false
-    
-    @Environment(\.presentationMode) var presentationMode
+    @State private var showSuccessMessage: Bool = false
 
     var body: some View {
         NavigationView {
@@ -100,12 +98,17 @@ struct NewRecipeView: View {
                             .padding([.leading, .trailing])
                     }
                     .padding(.top)
+                    
+                    // Success Message
+                    if showSuccessMessage {
+                        Text("Recipe Added Successfully!")
+                            .font(.headline)
+                            .foregroundColor(.green)
+                            .padding()
+                    }
                 }
             }
             .navigationTitle("Add Recipe")
-            .fullScreenCover(isPresented: $navigateToHomeView) {
-                ContentView()
-            }
         }
         .navigationViewStyle(.stack)
     }
@@ -138,13 +141,32 @@ struct NewRecipeView: View {
                 // Handle error (Show alert with error message)
                 print("Error adding recipe: \(error.localizedDescription)")
             } else {
-                // Handle success (Show alert for success)
+                // Handle success (Show success message)
                 print("Recipe added successfully!")
                 
-                // Navigate to HomeView
-                self.navigateToHomeView = true
+                // Reset fields
+                resetFields()
+                
+                // Show success message
+                showSuccessMessage = true
+                
+                // Hide success message after 2 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    showSuccessMessage = false
+                }
             }
         }
+    }
+
+    // Reset all fields after recipe is added
+    private func resetFields() {
+        recipeName = ""
+        chefName = ""
+        category = ""
+        imageURL = ""
+        age = ""
+        ingredients = ""
+        description = ""
     }
 }
 
